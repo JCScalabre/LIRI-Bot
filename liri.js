@@ -1,25 +1,32 @@
-var twitterKeys = require("./keys.js");
+// Variables: ----------------------------------------------------------
+
+var keys = require("./keys.js");
+
 var inquirer = require("inquirer");
 
-inquirer.prompt([
-{
-	type: "list",
-	message: "What would you like to do?",
-	choices: ["Spotify", "Twitter", "Movie"],
-	name: "choice"
-}	
-]).then(function(response) {
+// Functions: ----------------------------------------------------------
 
-	if (response.choice === "Twitter") {
-		inquireTweets();
-	};
-	if (response.choice === "Spotify") {
-		inquireSong();
-	};
-	if (response.choice === "Movie") {
-		inquireMovie();
-	};
-})
+function inquireMenu() {
+	inquirer.prompt([
+	{
+		type: "list",
+		message: "What would you like to do?",
+		choices: ["Spotify", "Twitter", "Movie"],
+		name: "choice"
+	}	
+	]).then(function(response) {
+
+		if (response.choice === "Twitter") {
+			inquireTweets();
+		};
+		if (response.choice === "Spotify") {
+			inquireSong();
+		};
+		if (response.choice === "Movie") {
+			inquireMovie();
+		};
+	})
+}
 
 function inquireSong() {
 	inquirer.prompt([
@@ -56,9 +63,9 @@ function inquireMovie() {
 		message: "What movie would you like to search?",
 		name: "movie"
 	}
-		]).then(function(response) {
-			movie = response.movie;
-			console.log("Loading movie details...");
+	]).then(function(response) {
+		movie = response.movie;
+		console.log("Loading movie details...");
 			// getMovie();
 		})
 };
@@ -67,7 +74,7 @@ function getTweets() {
 
 	var Twitter = require("twitter");
 
-	var client = new Twitter(twitterKeys);
+	var client = new Twitter(keys.twitter);
 
 	var params = {screen_name: username};
 
@@ -84,10 +91,7 @@ function getSpotify() {
 
 	var Spotify = require("node-spotify-api");
 
-	var spotify = new Spotify({
-		id: "390c81d9501549f3b1fdd756e2425eba",
-		secret: "7294aac6ddf543d1b964abb54e5f89a6"
-	});
+	var spotify = new Spotify(keys.spotify);
 
 	spotify.search({ type: "track", query: song }, function(err, data) {
 
@@ -104,7 +108,7 @@ function getSpotify() {
 		if (data.tracks.items[0].preview_url === null) {
 			console.log("This song has no preview link.");
 		} else {
-		console.log("Preview Link: " + data.tracks.items[0].preview_url);
+			console.log("Preview Link: " + data.tracks.items[0].preview_url);
 		};
 	});
 };
@@ -112,3 +116,7 @@ function getSpotify() {
 function getMovie() {
 
 };
+
+// Code: ----------------------------------------------------------
+
+inquireMenu();

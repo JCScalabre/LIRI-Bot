@@ -50,7 +50,7 @@ function inquireTweets() {
 	inquirer.prompt([
 	{ 
 		type: "input",
-		message: "Who's tweets would you like to see? Enter username: @",
+		message: "Who's tweets would you like to see? Enter username (Hit enter for default): @",
 		name: "username"
 	}
 	]).then(function(response) {
@@ -65,7 +65,7 @@ function inquireMovie() {
 	inquirer.prompt([
 	{
 		type: "input",
-		message: "What movie would you like to search?",
+		message: "What movie would you like to search? Or leave it blank for a surprise!",
 		name: "movie"
 	}
 	]).then(function(response) {

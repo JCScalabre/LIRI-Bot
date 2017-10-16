@@ -1,0 +1,5 @@
+spotify-this-song,"I want it that way",
+
+In this file, on the first line, you can type: "movie-this,<movie name>" OR "spotify-this-song,<song name>" OR "my-tweets,<twitter username>". 
+
+NOTE: FOR THE TWITTER FUNCTION, DON'T PUT QUOTES AROUND THE USERNAME.

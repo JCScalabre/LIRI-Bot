@@ -12,8 +12,8 @@ function startMenu() {
 	inquirer.prompt([
 	{
 		type: "list",
-		message: "What would you like to do?",
-		choices: ["Spotify", "Twitter", "Movie"],
+		message: "What would you like to do? (Hint: Feel free to leave inputs blank)",
+		choices: ["Spotify", "Twitter", "Movie", "Do What It Says"],
 		name: "choice"
 	}	
 	]).then(function(response) {
@@ -27,6 +27,9 @@ function startMenu() {
 		if (response.choice === "Movie") {
 			inquireMovie();
 		};
+		if (response.choice === "Do What It Says") {
+			doWhatItSays();
+		}
 	})
 };
 
@@ -50,7 +53,7 @@ function inquireTweets() {
 	inquirer.prompt([
 	{ 
 		type: "input",
-		message: "Who's tweets would you like to see? Enter username (Hit enter for default): @",
+		message: "Who's tweets would you like to see? Enter username: @",
 		name: "username"
 	}
 	]).then(function(response) {
@@ -65,7 +68,7 @@ function inquireMovie() {
 	inquirer.prompt([
 	{
 		type: "input",
-		message: "What movie would you like to search? Or leave it blank for a surprise!",
+		message: "What movie would you like to search?",
 		name: "movie"
 	}
 	]).then(function(response) {
@@ -86,9 +89,10 @@ function getTweets() {
 	client.get("statuses/user_timeline", params, function(error, tweets, response) {
 		if (!error) {
 			console.log("Here are your 20 most recent tweets: ");
-			for (var i = 0; i < 20; i++)
-				console.log("Tweet #" + (i+1) + ": " + tweets[i].text);
-		}
+			for (var i = 0; i < 20; i++) {
+				console.log("Tweet #" + (i+1) + ": " + tweets[i].text + " Created at: " + tweets[i].created_at);
+			};
+		};
 	});
 };
 
@@ -98,6 +102,10 @@ function getSpotify() {
 	var Spotify = require("node-spotify-api");
 
 	var spotify = new Spotify(keys.spotify);
+
+	if (song === "") {
+		song = "The Sign Ace of Base";
+	}
 
 	spotify.search({ type: "track", query: song }, function(err, data) {
 
@@ -125,7 +133,6 @@ function getMovie() {
 	var request = require("request");
 
 	if (movie === "") {
-		console.log("You didn't enter a movie, here's a great one though: ");
 		movie = "Mr. Nobody";
 	}
 
@@ -133,27 +140,56 @@ function getMovie() {
 
 	request("http://www.omdbapi.com/?t=" + movie + "&y=&plot=short&apikey=40e9cece", function(error, response, body) {
 
-  		// If the request is successful (i.e. if the response status code is 200)
-  		if (JSON.parse(body).Response === "False") {
-  			console.log("Your search returned no results. Please try again.");
-  		} else {
+		if (JSON.parse(body).Response === "False") {
+			console.log("Your search returned no results. Please try again.");
+		} else {
 
-  			if (!error && response.statusCode === 200) {
+			if (!error && response.statusCode === 200) {
 
-  				console.log("Title: " + JSON.parse(body).Title);
-  				console.log("Year: " + JSON.parse(body).Year);
-  				console.log("IMDB Rating: " + JSON.parse(body).imdbRating);
-  				console.log("Rotten Tomatoes Rating: " + JSON.parse(body).Ratings[1].Value);
-  				console.log("Production Country: " + JSON.parse(body).Country);
-  				console.log("Language(s) of Movie: " + JSON.parse(body).Language);
-  				console.log("Plot: " + JSON.parse(body).Plot);
-  				console.log("Actors: " + JSON.parse(body).Actors);
+				console.log("Title: " + JSON.parse(body).Title);
+				console.log("Year: " + JSON.parse(body).Year);
+				console.log("IMDB Rating: " + JSON.parse(body).imdbRating);
+				console.log("Rotten Tomatoes Rating: " + JSON.parse(body).Ratings[1].Value);
+				console.log("Production Country: " + JSON.parse(body).Country);
+				console.log("Language(s) of Movie: " + JSON.parse(body).Language);
+				console.log("Plot: " + JSON.parse(body).Plot);
+				console.log("Actors: " + JSON.parse(body).Actors);
 
-  			}
-  		}
-  	});
+			}
+		}
+	});
+};
+
+function doWhatItSays() {
+
+	var fs = require('file-system');
+
+	fs.readFile("random.txt", "utf8", function(error, data) {
+
+		if (error) {
+			return console.log(error);
+		};
+
+		var dataArr = data.split(",");
+
+		if (dataArr[0] === "spotify-this-song") {
+			song = dataArr[1];
+			getSpotify();
+		}
+
+		if (dataArr[0] === "movie-this") {
+			movie = dataArr[1];
+			getMovie();
+		}
+
+		if (dataArr[0] === "my-tweets") {
+			username = dataArr[1];
+			getTweets();
+		}
+	});
 };
 
 // Code: ----------------------------------------------------------
 
 startMenu();
+

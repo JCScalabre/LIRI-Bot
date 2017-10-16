@@ -5,6 +5,9 @@ var keys = require("./keys.js");
 
 var inquirer = require("inquirer");
 
+var fs = require('file-system');
+
+
 // Functions: ----------------------------------------------------------
 
 // Main inquire menu where the user can select what they want Liri to do:
@@ -12,7 +15,7 @@ function startMenu() {
 	inquirer.prompt([
 	{
 		type: "list",
-		message: "What would you like to do? (Hint: Feel free to leave inputs blank)",
+		message: "What would you like to do? (Hint: Feel free to leave inputs blank for default values)",
 		choices: ["Spotify", "Twitter", "Movie", "Do What It Says"],
 		name: "choice"
 	}	
@@ -91,6 +94,13 @@ function getTweets() {
 			console.log("Here are your 20 most recent tweets: ");
 			for (var i = 0; i < 20; i++) {
 				console.log("Tweet #" + (i+1) + ": " + tweets[i].text + " Created at: " + tweets[i].created_at);
+				fs.appendFile("log.txt", "Tweet #" + (i+1) + ": " + tweets[i].text + " Created at: " + tweets[i].created_at + "\n", function(err) {
+
+					if (err) {
+						return console.log(err);
+					};
+
+				});
 			};
 		};
 	});
@@ -119,10 +129,15 @@ function getSpotify() {
 
 		console.log("Album: " + data.tracks.items[0].album.name); 
 
+		fs.appendFile("log.txt", "Song Name: " + data.tracks.items[0].name + "\n", function(err) {});
+		fs.appendFile("log.txt", "Artist: " + data.tracks.items[0].album.artists[0].name + "\n", function(err) {});
+		fs.appendFile("log.txt", "Album: " + data.tracks.items[0].album.name + "\n", function(err) {});
+
 		if (data.tracks.items[0].preview_url === null) {
 			console.log("This song has no preview link.");
 		} else {
 			console.log("Preview Link: " + data.tracks.items[0].preview_url);
+			fs.appendFile("log.txt", data.tracks.items[0].preview_url + "\n", function(err) {});
 		};
 	});
 };
@@ -155,14 +170,20 @@ function getMovie() {
 				console.log("Plot: " + JSON.parse(body).Plot);
 				console.log("Actors: " + JSON.parse(body).Actors);
 
+				fs.appendFile("log.txt","Title: " + JSON.parse(body).Title + "\n", function(err) {});
+				fs.appendFile("log.txt","Year: " + JSON.parse(body).Year + "\n", function(err) {});
+				fs.appendFile("log.txt","IMDB Rating: " + JSON.parse(body).imdbRating + "\n", function(err) {});
+				fs.appendFile("log.txt","Rotten Tomatoes Rating: " + JSON.parse(body).Ratings[1].Value + "\n", function(err) {});
+				fs.appendFile("log.txt","Production Country: " + JSON.parse(body).Country + "\n", function(err) {});
+				fs.appendFile("log.txt","Language(s) of Movie: " + JSON.parse(body).Language + "\n", function(err) {});
+				fs.appendFile("log.txt","Plot: " + JSON.parse(body).Plot + "\n", function(err) {});
+				fs.appendFile("log.txt","Actors: " + JSON.parse(body).Actors + "\n", function(err) {});
 			}
 		}
 	});
 };
 
 function doWhatItSays() {
-
-	var fs = require('file-system');
 
 	fs.readFile("random.txt", "utf8", function(error, data) {
 
@@ -192,4 +213,3 @@ function doWhatItSays() {
 // Code: ----------------------------------------------------------
 
 startMenu();
-
